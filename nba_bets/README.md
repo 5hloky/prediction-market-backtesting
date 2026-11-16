@@ -75,7 +75,7 @@ alone. The slate opens with the fifteen strongest props.
 
 - **Useful:** opponent-adjusted team ratings, the injury adjustment and the
   possession model. Knowing who is out improves the margin projection from an
-  average miss of 11.35 to 11.25.
+  average miss of 11.32 to 11.25.
 - **Not useful, measured:** with the model trained on the first two seasons and
   tested on the 1,353 games since, removing head-to-head history, positional
   matchups or a player's history against an opponent each changed the average
