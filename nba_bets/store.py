@@ -1,6 +1,7 @@
 """Local cache of finished games (box score + closing line), built from ESPN.
 
-The cache lives in ``nba_bets/data/`` (git-ignored) and is filled incrementally:
+The cache lives in ``nba_bets/cache/`` and is committed, so a fresh checkout only has
+to fetch what has happened since. It is filled incrementally:
 ``sync`` only fetches days and games it has not already stored.
 """
 
@@ -16,7 +17,7 @@ from typing import Any
 
 from nba_bets import espn
 
-DATA_DIR = Path(__file__).resolve().parent / "data"
+DATA_DIR = Path(__file__).resolve().parent / "cache"
 GAMES_PATH = DATA_DIR / "games.jsonl.gz"
 DAYS_PATH = DATA_DIR / "days_done.json"
 

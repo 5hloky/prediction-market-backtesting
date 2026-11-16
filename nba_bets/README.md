@@ -30,7 +30,7 @@ make money, and nothing here is betting advice. Full numbers are in
 Needs Python 3.11+ and `numpy`. Run from the repository root.
 
 ```bash
-python -m nba_bets sync                 # first run: ~25 minutes, three-plus seasons
+python -m nba_bets sync                 # catch up on games since the committed cache
 python -m nba_bets today                # today's card (refreshes history first)
 python -m nba_bets today --date 2026-11-17
 python -m nba_bets game "LAL @ PHX"     # one game; also "lakers suns" or "celtics"
@@ -116,7 +116,7 @@ free, confidential help.
 | File | Role |
 |---|---|
 | `espn.py` | Fetching and parsing schedules, box scores, lines, injuries |
-| `store.py` | Incremental local cache of finished games (`data/`, git-ignored) |
+| `store.py` | Incremental cache of finished games and opening prop lines (`cache/`, committed)  |
 | `features.py` | Point-in-time team and player state, and the pre-game matchup view |
 | `sim.py` | Possession-by-possession simulation |
 | `model.py` | Calibration, pricing, and the walk-forward backtest |
