@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import gzip
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -267,3 +268,104 @@ def parse_game(payload: dict[str, Any]) -> dict[str, Any] | None:
         "away": sides["away"],
         "odds": None,
     }
+
+
+# --------------------------------------------------------------------------- player props
+
+PROP_BOOKS = ("100", "58")  # DraftKings, ESPN BET
+
+_PROP_TOTALS = {
+    "Total Points": "pts",
+    "Total Rebounds": "reb",
+    "Total Assists": "ast",
+    "Total 3-Point Field Goals": "fg3m",
+    "Total Steals": "stl",
+    "Total Blocks": "blk",
+    "Total Turnovers": "tov",
+    "Total Points and Rebounds": "pr",
+    "Total Points and Assists": "pa",
+    "Total Assists and Rebounds": "ra",
+    "Total Points, Rebounds, and Assists": "pra",
+}
+_PROP_MILESTONES = {
+    "Points Milestones": "pts",
+    "Rebounds Milestones": "reb",
+    "Assists Milestones": "ast",
+    "3-Point Field Goals Milestones": "fg3m",
+    "Steals Milestones": "stl",
+    "Blocks Milestones": "blk",
+    "Points + Rebounds Milestones": "pr",
+    "Points + Assists Milestones": "pa",
+    "Rebounds + Assists Milestones": "ra",
+    "Points + Assists + Rebounds Milestones": "pra",
+}
+
+
+def prop_bets(event_id: str, book_id: str) -> list[dict[str, Any]]:
+    """Every prop a book lists for a game; an empty list when it lists none."""
+    items: list[dict[str, Any]] = []
+    page = 1
+    while True:
+        url = f"{CORE}/events/{event_id}/competitions/{event_id}/odds/{book_id}/propBets?limit=1000&page={page}"
+        try:
+            payload = get_json(url)
+        except EspnError:
+            return items
+        items.extend(payload.get("items") or [])
+        if page >= int(payload.get("pageCount") or 1):
+            return items
+        page += 1
+
+
+def _implied(american: float) -> float:
+    return 100 / (american + 100) if american > 0 else -american / (-american + 100)
+
+
+def parse_props(
+    items: list[dict[str, Any]], *, opening: bool
+) -> dict[str, dict[str, list[float | None]]]:
+    """Main line per player and stat: ``{athlete_id: {stat: [line, over_price, under_price]}}``.
+
+    ``opening=True`` reads the numbers each prop opened at, which are always
+    pre-game; the "current" numbers of a finished game were updated in play.
+    Books publish either an over/under pair at one line, or a ladder of "N or
+    more" prices; for a ladder the rung priced closest to even is the main line
+    and no under price is known.
+    """
+    key = "open" if opening else "value"
+    pairs: dict[tuple[str, str], list[tuple[float, float]]] = {}
+    ladders: dict[tuple[str, str], dict[float, float]] = {}
+    for item in items:
+        name = (item.get("type") or {}).get("name") or ""
+        found = re.search(r"athletes/(\d+)", (item.get("athlete") or {}).get("$ref") or "")
+        if not found:
+            continue
+        odds = item.get("odds") or {}
+        raw_line = str((odds.get("total") or {}).get(key) or "")
+        price = _num((odds.get("american") or {}).get(key))
+        if price is None or not raw_line:
+            continue
+        if name in _PROP_TOTALS and not raw_line.endswith("+"):
+            line = _num(raw_line)
+            if line is not None:
+                pairs.setdefault((found.group(1), _PROP_TOTALS[name]), []).append((line, price))
+        stat = _PROP_MILESTONES.get(name)
+        if stat and raw_line.endswith("+"):
+            threshold = _num(raw_line[:-1])
+            if threshold is not None:
+                ladders.setdefault((found.group(1), stat), {})[threshold - 0.5] = price
+
+    out: dict[str, dict[str, list[float | None]]] = {}
+    for (athlete, stat), entries in pairs.items():
+        if len(entries) == 2 and entries[0][0] == entries[1][0]:
+            if 0.3 <= _implied(entries[0][1]) <= 0.7:
+                out.setdefault(athlete, {})[stat] = [entries[0][0], entries[0][1], entries[1][1]]
+        else:  # this book lists alternate "over" lines under the same market name
+            ladders.setdefault((athlete, stat), {}).update(dict(entries))
+    for (athlete, stat), rungs in ladders.items():
+        if stat in out.get(athlete, {}):
+            continue
+        line, price = min(rungs.items(), key=lambda kv: abs(_implied(kv[1]) - 0.5))
+        if 0.3 <= _implied(price) <= 0.7:
+            out.setdefault(athlete, {})[stat] = [line, price, None]
+    return out

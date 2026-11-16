@@ -5,7 +5,7 @@ import copy
 import numpy as np
 import pytest
 
-from nba_bets import espn, model, sim
+from nba_bets import espn, model, props, sim
 from nba_bets.features import League, available_from_box, points_per_possession
 
 
@@ -170,3 +170,69 @@ def test_core_odds_ignores_live_books_and_reads_home_line() -> None:
         -180.0,
     )
     assert espn.parse_core_odds({"items": [payload["items"][0]]}) is None
+
+
+def test_prop_parser_reads_pairs_and_ladders() -> None:
+    def item(kind: str, athlete: str, line: str, price: str) -> dict:
+        return {
+            "type": {"name": kind},
+            "athlete": {"$ref": f"http://x/athletes/{athlete}?lang=en"},
+            "odds": {
+                "total": {"value": "99.5", "open": line},
+                "american": {"value": "+900", "open": price},
+            },
+        }
+
+    items = [
+        item("Total Points", "1", "21.5", "-112"),
+        item("Total Points", "1", "21.5", "-108"),
+        item("Steals Milestones", "1", "1+", "-160"),
+        item("Steals Milestones", "1", "2+", "+250"),
+        item("Total Rebounds", "2", "4.5", "-300"),
+        item("Total Rebounds", "2", "6.5", "+105"),
+        item("Total Rebounds", "2", "8.5", "+320"),
+    ]
+    parsed = espn.parse_props(items, opening=True)
+    assert parsed["1"]["pts"] == [21.5, -112.0, -108.0]
+    assert parsed["1"]["stl"] == [0.5, -160.0, None]
+    assert parsed["2"]["reb"] == [6.5, 105.0, None]
+
+
+def test_prop_probability_is_a_sane_distribution() -> None:
+    calibration = props.Calibration(scale=1.0, linear=1.5, quadratic=0.02)
+    probs = [calibration.prob_over(6.0, line) for line in (2.5, 5.5, 8.5, 12.5)]
+    assert probs == sorted(probs, reverse=True)
+    assert 0.4 < probs[1] < 0.6
+    assert calibration.prob_over(6.0, 60.5) == pytest.approx(0.0, abs=1e-6)
+    assert calibration.prob_over(9.0, 5.5) > calibration.prob_over(6.0, 5.5)
+
+
+def test_prop_without_credited_edge_is_never_positive_value() -> None:
+    calibration = props.Calibration()
+    view = props.price(9.0, [5.5, -115.0, -105.0], calibration, belief=0.0)
+    assert view["side"] == "more" and view["two_way"]
+    assert view["prob"] == pytest.approx(view["market_prob"])
+    assert view["ev"] < 0
+    trusted = props.price(9.0, [5.5, -115.0, -105.0], calibration, belief=1.0)
+    assert trusted["ev"] > 0
+    one_sided = props.price(9.0, [5.5, -115.0, None], calibration, belief=1.0)
+    assert not one_sided["two_way"]
+
+
+def test_prop_records_match_box_scores_and_stay_pregame() -> None:
+    games = _season()
+    records, _ = props.build_records(games, {}, availability="actual")
+    assert records
+    last = records[-1]
+    row = next(p for p in games[-1]["away"]["players"] if f"P{p['id']}" == last["player"])
+    assert last["actual"]["pra"] == pytest.approx(row["pts"] + row["orb"] + row["drb"] + row["ast"])
+    assert last["proj"]["pra"] == pytest.approx(
+        last["proj"]["pts"] + last["proj"]["reb"] + last["proj"]["ast"]
+    )
+    changed = [dict(g) for g in games]
+    changed[-1] = _game(len(games) - 1, games[-1]["home"]["id"], games[-1]["away"]["id"], 160, 80)
+    for side in ("home", "away"):
+        for p in changed[-1][side]["players"]:
+            p["pts"] *= 3
+    again, _ = props.build_records(changed, {}, availability="actual")
+    assert again[-1]["proj"] == pytest.approx(last["proj"])

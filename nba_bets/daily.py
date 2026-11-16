@@ -17,11 +17,12 @@ from typing import Any
 
 import numpy as np
 
-from nba_bets import espn, model, sim, store
+from nba_bets import espn, model, props, sim, store
 from nba_bets.features import League, Matchup, TeamView, game_day
 
 OUT_STATUSES = {"out", "suspension", "injured reserve"}
-PICKS_DIR = store.DATA_DIR / "picks"
+PICKS_DIR = store.DATA_DIR.parent / "picks"  # tracked in git: the forward record
+PROP_MIN_MINUTES = 12.0
 GAP_BUCKETS = ((0, 1.5), (1.5, 3), (3, 5), (5, 99))
 
 
@@ -32,6 +33,9 @@ class State:
     summary: dict[str, Any]
     games: int
     through: str
+    prop_calibration: dict[str, props.Calibration] = field(default_factory=dict)
+    prop_belief: dict[str, float] = field(default_factory=dict)
+    prop_summary: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -44,6 +48,7 @@ class GameCard:
     sim: sim.SimResult
     injuries: dict[str, list[dict[str, str]]]  # team id -> entries
     pick: dict[str, Any] = field(default_factory=dict)
+    props: list[dict[str, Any]] = field(default_factory=list)  # one row per player and market
 
 
 def us_today() -> date:
@@ -53,12 +58,18 @@ def us_today() -> date:
 def load_state(*, refresh: bool = True) -> State:
     if refresh:
         store.sync(verbose=False)
+        store.sync_props(verbose=False)
     games = store.load_games()
     if not games:
         raise SystemExit("no game history cached; run `python -m nba_bets sync` first")
     rows, league = model.build_rows(games)
     fitted, result = model.fit_live(rows)
-    return State(league, fitted, model.summarize(result), len(games), games[-1]["date"])
+    records, _ = props.build_records(games, store.load_props(), availability="recent")
+    calibration, belief, prop_summary = props.fit_live(records)
+    return State(
+        league, fitted, model.summarize(result), len(games), games[-1]["date"],
+        calibration, belief, prop_summary,
+    )  # fmt: skip
 
 
 # --------------------------------------------------------------------------- inputs
@@ -221,6 +232,7 @@ def analyse(
         home_available=_available(league, home_id, injuries.get(home_id, [])),
         away_available=_available(league, away_id, injuries.get(away_id, [])),
         neutral=event.get("neutral", False),
+        confirmed=False,
     )  # fmt: skip
     pricing = model.price(state.fitted, view.features, event.get("odds"))
     result = sim.simulate(
@@ -233,7 +245,48 @@ def analyse(
         {home_id: injuries.get(home_id, []), away_id: injuries.get(away_id, [])},
     )  # fmt: skip
     card.pick = _choose(state, card)
+    card.props = _prop_rows(state, card)
     return card
+
+
+def live_props(event_id: str) -> dict[str, dict[str, list[float | None]]]:
+    """Current prop lines for an upcoming game, from whichever book lists more of them."""
+    best: dict[str, dict[str, list[float | None]]] = {}
+    for book in espn.PROP_BOOKS:
+        parsed = espn.parse_props(espn.prop_bets(event_id, book), opening=False)
+        if sum(map(len, parsed.values())) > sum(map(len, best.values())):
+            best = parsed
+    return best
+
+
+def _prop_rows(state: State, card: GameCard) -> list[dict[str, Any]]:
+    lines = live_props(card.event_id)
+    rows: list[dict[str, Any]] = []
+    for view in (card.matchup.away, card.matchup.home):
+        for p in sorted(view.players, key=lambda x: -x.minutes):
+            if p.minutes < PROP_MIN_MINUTES:
+                continue
+            expected = props.projected(p)
+            for market in props.MARKETS:
+                calibration = state.prop_calibration.get(market, props.Calibration())
+                row: dict[str, Any] = {
+                    "team": view.abbr, "player_id": p.id, "player": p.name, "minutes": p.minutes,
+                    "market": market, "projection": expected[market] * calibration.scale, "grade": None,
+                }  # fmt: skip
+                line = (lines.get(p.id) or {}).get(market)
+                if line is not None:
+                    row.update(
+                        props.price(
+                            expected[market], line, calibration, state.prop_belief.get(market, 0.0)
+                        )
+                    )
+                    bet = row["two_way"] and row["ev"] >= model.MIN_EV
+                    row["grade"] = "BET" if bet else "LEAN"
+                    # ``prob`` is the chance of the picked side after shrinking the raw model
+                    # toward the book by what the backtest has earned; it is what gets shown.
+                    row["model_side_prob"] = row["prob"]
+                rows.append(row)
+    return rows
 
 
 def cards_for(state: State, day: date) -> list[GameCard]:
@@ -327,13 +380,16 @@ def _team_block(
     order = np.argsort([-p.usage for p in view.players])[:4]
     for i in order:
         p = view.players[i]
-        low, high = np.percentile(points[:, i], [10, 90])
+        # Same number as the props table; the simulation supplies the spread around it.
+        scale = state.prop_calibration.get("pts", props.Calibration()).scale
+        mean = p.proj["pts"] * scale
+        low, high = np.percentile(points[:, i], [10, 90]) * mean / max(points[:, i].mean(), 1e-6)
         note = f"{opp.abbr} allow {p.matchup - 1:+.0%} to {p.group}s"
         if abs(p.history) >= 0.03:
             note += f", own history vs {opp.abbr} {p.history:+.0%}"
         lines.append(
             f"- {p.name} ({p.pos}, {p.minutes:.0f} min, {p.usage:.0%} of plays): "
-            f"{points[:, i].mean():.1f} pts projected (10-90%: {low:.0f}-{high:.0f}); {note}"
+            f"{mean:.1f} pts projected (10-90%: {low:.0f}-{high:.0f}); {note}"
         )
     return lines
 
@@ -397,7 +453,81 @@ def render(state: State, card: GameCard) -> str:
     lines += _team_block(state, away, home, card.sim.away_players, card.injuries.get(away.id, []))
     lines.append("")
     lines += _team_block(state, home, away, card.sim.home_players, card.injuries.get(home.id, []))
+    lines += _prop_tables(card)
     return "\n".join(lines)
+
+
+def _prop_cell(row: dict[str, Any]) -> str:
+    if row["grade"] is None:
+        return f"{row['projection']:.1f}"
+    text = f"{row['projection']:.1f} · {row['side'].capitalize()} {row['line']:g} ({row['model_side_prob']:.0%})"
+    return f"**{text} ★**" if row["grade"] == "BET" else text
+
+
+def _prop_tables(card: GameCard) -> list[str]:
+    """One row per player, one column per stat: projection, then the side of the line and
+    the model's probability of that side. ★ marks a prop graded BET."""
+    if not card.props:
+        return []
+    has_lines = any(r["grade"] for r in card.props)
+    out = [
+        "",
+        "**Player props** — projection"
+        + (
+            " · the side of the line the bot prefers (its chance of winning, after shrinking toward the book). ★ = graded BET."
+            if has_lines
+            else " only; no prop lines posted yet."
+        ),
+    ]
+    markets = list(props.MARKETS)
+    for team in dict.fromkeys(r["team"] for r in card.props):
+        out += ["", "| " + team + " | Min | " + " | ".join(props.LABELS[m] for m in markets) + " |"]
+        out.append("|---|---|" + "---|" * len(markets))
+        players = dict.fromkeys(r["player"] for r in card.props if r["team"] == team)
+        for player in players:
+            cells = {
+                r["market"]: r for r in card.props if r["team"] == team and r["player"] == player
+            }
+            out.append(
+                f"| {player} | {cells[markets[0]]['minutes']:.0f} | "
+                + " | ".join(_prop_cell(cells[m]) for m in markets)
+                + " |"
+            )
+    return out
+
+
+def top_props(state: State, cards: list[GameCard], limit: int = 15) -> list[str]:
+    """The strongest prop picks on the slate, bets first, each with its back-tested record."""
+    rows = [
+        dict(r, game=f"{c.matchup.away.abbr} @ {c.matchup.home.abbr}")
+        for c in cards
+        for r in c.props
+        if r["grade"]
+    ]
+    if not rows:
+        return []
+    rows.sort(key=lambda r: (r["grade"] != "BET", -r["ev"] if r["grade"] == "BET" else -r["gap"]))
+    out = [
+        "## Top player props",
+        "",
+        "| Player | Game | Pick | Price | Projection | Bot chance | Book chance | Grade | Back-tested bets in this market |",
+        "|---|---|---|---|---|---|---|---|---|",
+    ]
+    for r in rows[:limit]:
+        book = r["market_prob"] if r["side"] == "more" else 1 - r["market_prob"]
+        history = (state.prop_summary.get(r["market"]) or {}).get("bets") or {}
+        past = (
+            f"{history['wins']:.0f}-{history['losses']:.0f}, {history['roi']:+.1%} ROI"
+            if history.get("bets")
+            else "no bets graded"
+        )
+        price = f"{r['price']:+.0f}" if r["two_way"] or r["side"] == "more" else "n/a"
+        out.append(
+            f"| {r['player']} ({r['team']}) | {r['game']} | {r['side'].capitalize()} {r['line']:g} "
+            f"{props.LABELS[r['market']]} | {price} | {r['projection']:.1f} | {r['model_side_prob']:.0%} | "
+            f"{book:.0%} | {r['grade']} | {past} |"
+        )
+    return out
 
 
 def _rescale(draws: np.ndarray, sigma: float) -> np.ndarray:
@@ -437,7 +567,10 @@ def render_slate(state: State, cards: list[GameCard], day: date) -> str:
         head.append(
             f"| {c.matchup.away.abbr} @ {c.matchup.home.abbr} | {c.pick['label']} | {c.pick['grade']} | {gap} |"
         )
-    return "\n".join(head) + "\n\n" + "\n\n".join(render(state, c) for c in ranked)
+    best = top_props(state, cards)
+    return "\n\n".join(
+        ["\n".join(head), *(["\n".join(best)] if best else []), *(render(state, c) for c in ranked)]
+    )
 
 
 # --------------------------------------------------------------------------- ledger
@@ -456,6 +589,15 @@ def save_picks(cards: list[GameCard], day: date) -> None:
             "game": f"{card.matchup.away.abbr} @ {card.matchup.home.abbr}",
             "made_at": datetime.now(UTC).isoformat(timespec="seconds"),
             **{k: card.pick.get(k) for k in keep},
+            "props": [
+                {
+                    k: r[k]
+                    for k in ("player_id", "player", "market", "side", "line", "price", "grade")
+                }
+                for r in card.props
+                if r["grade"] == "BET"
+                or (r["grade"] == "LEAN" and r["two_way"] and r["gap"] >= 0.10)
+            ],
         }
     path.write_text(json.dumps(saved, indent=1))
 
@@ -463,11 +605,35 @@ def save_picks(cards: list[GameCard], day: date) -> None:
 def grade() -> dict[str, dict[str, float]]:
     """Settle every saved pick whose game has finished."""
     results = {g["id"]: g for g in store.load_games()}
-    settled: dict[str, list[dict[str, Any]]] = {"BET": [], "LEAN": []}
+    settled: dict[str, list[dict[str, Any]]] = {
+        "BET": [],
+        "LEAN": [],
+        "PROP BET": [],
+        "PROP LEAN": [],
+    }
     for path in sorted(PICKS_DIR.glob("*.json")) if PICKS_DIR.exists() else []:
         for event_id, pick in json.loads(path.read_text()).items():
             game = results.get(event_id)
-            if game is None or pick["grade"] not in settled:
+            if game is None:
+                continue
+            box = {
+                r["id"]: r
+                for side in ("home", "away")
+                for r in game[side]["players"]
+                if r["min"] > 0
+            }
+            for prop in pick.get("props") or []:
+                if prop["player_id"] not in box:
+                    continue  # did not play: the book voids the prop
+                result = props.actual(box[prop["player_id"]])[prop["market"]]
+                if result == prop["line"]:
+                    profit = 0.0
+                elif (result > prop["line"]) == (prop["side"] == "more"):
+                    profit = model.decimal_odds(prop["price"]) - 1
+                else:
+                    profit = -1.0
+                settled[f"PROP {prop['grade']}"].append({"profit": profit})
+            if pick["grade"] not in settled:
                 continue
             candidate = model.Candidate(
                 pick["market"], pick["side"], pick["line"],
@@ -490,5 +656,6 @@ __all__ = [
     "render",
     "render_slate",
     "save_picks",
+    "top_props",
     "us_today",
 ]

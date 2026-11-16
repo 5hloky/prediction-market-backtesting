@@ -5,6 +5,7 @@ python -m nba_bets today                # card for today's slate
 python -m nba_bets today --date 2026-11-17
 python -m nba_bets game "LAL @ PHX"     # one game, by team names or abbreviations
 python -m nba_bets backtest             # walk-forward record against closing lines
+    python -m nba_bets backtest --props     # same for player props, against opening lines
 python -m nba_bets grade                # settle the picks the bot has made so far
 """
 
@@ -15,7 +16,7 @@ import json
 from datetime import date
 from typing import Any
 
-from nba_bets import daily, model, store
+from nba_bets import daily, model, props, store
 
 
 def backtest_report(summary: dict[str, Any], availability: str, line: str) -> str:
@@ -89,6 +90,51 @@ def backtest_report(summary: dict[str, Any], availability: str, line: str) -> st
     return "\n".join(out)
 
 
+def props_report(summary: dict[str, Any]) -> str:
+    out = [
+        "# Player props: walk-forward backtest against opening lines",
+        "",
+        "Each month is priced using only earlier games. The bot is not told who sat out. Only props",
+        "posted with both a more and a less price are graded, at the opening price. Opening lines are",
+        "softer than what is on offer near tip-off, so read this as an upper bound.",
+        "",
+        "| Market | Props | Bot's side won | When bot and book differ by 10+ points of probability | Edge credited | Bets | W-L | ROI |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for market, label in props.LABELS.items():
+        row = summary.get(market)
+        if not row:
+            continue
+        big = row["by_gap"].get("0.10-1.00")
+        big_text = (
+            f"{big['hit_rate']:.1%} of {big['props']} (book expected {big['book_expected']:.1%})"
+            if big
+            else "—"
+        )
+        bets = row["bets"]
+        out.append(
+            f"| {label} | {row['props']} | {row['hit_rate']:.1%} | {big_text} | {row['edge']['credited']:.2f} | "
+            f"{bets['bets']:.0f} | {bets['wins']:.0f}-{bets['losses']:.0f} | {bets['roi']:+.1%} ± {bets['roi_se']:.1%} |"
+        )
+    total = summary["all_bets"]
+    out += [
+        "",
+        (
+            f"All prop bets: {total['bets']:.0f}, {total['wins']:.0f}-{total['losses']:.0f}, "
+            f"hit rate {total['hit_rate']:.1%}, ROI {total['roi']:+.1%} ± {total['roi_se']:.1%}."
+        ),
+        "",
+        "| Season | Bets | W-L | Hit rate | ROI |",
+        "|---|---|---|---|---|",
+    ]
+    for season, r in summary["bets_by_season"].items():
+        out.append(
+            f"| {int(season) - 1}-{season[2:]} | {r['bets']:.0f} | {r['wins']:.0f}-{r['losses']:.0f} | "
+            f"{r['hit_rate']:.1%} | {r['roi']:+.1%} ± {r['roi_se']:.1%} |"
+        )
+    return "\n".join(out)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="nba_bets", description=__doc__.splitlines()[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -104,11 +150,19 @@ def main(argv: list[str] | None = None) -> None:
     bt.add_argument("--availability", choices=("actual", "none"), default="actual")
     bt.add_argument("--line", choices=("close", "open"), default="close")
     bt.add_argument("--json", action="store_true")
+    bt.add_argument("--props", action="store_true", help="grade player props instead of game lines")
     sub.add_parser("grade", help="settle the picks made so far")
     args = parser.parse_args(argv)
 
     if args.command == "sync":
         store.sync(args.first_season)
+        store.sync_props()
+    elif args.command == "backtest" and args.props:
+        records, _ = props.build_records(
+            store.load_games(), store.load_props(), availability="recent"
+        )
+        summary = props.summarize(props.walk_forward(records))
+        print(json.dumps(summary, indent=1) if args.json else props_report(summary))
     elif args.command == "backtest":
         rows, _ = model.build_rows(
             store.load_games(), availability=args.availability, line=args.line

@@ -53,6 +53,8 @@ RATING_K = 0.08
 HOME_EDGE_PER_100 = 2.4
 SEASON_CARRY = 0.7
 FT_PER_TRIP = 1 / 0.44
+OPP_STATS = {"reb": ("orb", "drb"), "ast": ("ast",), "stl": ("stl",), "blk": ("blk",)}
+OPP_WEIGHT = 1.0  # how much of the opponent's conceded rate to apply to a player's line
 ROTATION_WINDOW = 8  # team games a player may miss and still count as in the rotation
 
 
@@ -183,6 +185,9 @@ class Team:
     recent_dates: list[str] = field(default_factory=list)
     roster: set[str] = field(default_factory=set)
     dvp: dict[str, list[float]] = field(default_factory=lambda: {g: [0.0, 0.0] for g in GROUPS})
+    allowed: dict[str, np.ndarray] = field(
+        default_factory=lambda: {g: np.zeros(len(KEYS)) for g in GROUPS}
+    )  # full box-score lines conceded to each position group
     log: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -204,6 +209,9 @@ class PlayerView:
     history: float  # own scoring rate vs this opponent relative to own norm, shrunk
     ppm: float
     proj_pts: float = 0.0
+    rate: dict[str, float] = field(default_factory=dict)  # per-minute rebounds, assists, ...
+    opp: dict[str, float] = field(default_factory=dict)  # what this defence allows, 1.0 = neutral
+    proj: dict[str, float] = field(default_factory=dict)  # expected box-score line tonight
 
 
 @dataclass
@@ -304,6 +312,22 @@ class League:
             and self.players[i].mpg > 0
         ]
 
+    def allowed_factors(self, team_id: str) -> dict[str, dict[str, float]]:
+        """Per position group: rebounds, assists, steals and blocks this team concedes
+        per minute, relative to league (1.0 = average), shrunk toward 1."""
+        team = self._team(team_id)
+        out: dict[str, dict[str, float]] = {}
+        for g in GROUPS:
+            league = self.pos[g] / self.pos[g][IX["min"]]
+            got, minutes = team.allowed[g], team.allowed[g][IX["min"]]
+            out[g] = {}
+            for stat, keys in OPP_STATS.items():
+                base = sum(league[IX[k]] for k in keys)
+                out[g][stat] = (
+                    (sum(got[IX[k]] for k in keys) + 900.0 * base) / (minutes + 900.0) / base
+                )
+        return out
+
     def dvp(self, team_id: str) -> dict[str, float]:
         """Scoring allowed to each position group relative to the team's own average."""
         team = self._team(team_id)
@@ -318,7 +342,9 @@ class League:
 
     # ------------------------------------------------------------- projection
 
-    def _minutes(self, players: list[Player | None], fallback: list[float]) -> np.ndarray:
+    def _minutes(
+        self, players: list[Player | None], fallback: list[float], confirmed: bool = True
+    ) -> np.ndarray:
         """Expected minutes tonight, summing to 240.
 
         When regulars are missing, the others each pick up only a few extra minutes;
@@ -330,6 +356,14 @@ class League:
                 for p, f in zip(players, fallback, strict=True)
             ]
         )
+        if not confirmed:
+            # Not everyone listed will get in the game. Weight fringe players by how often
+            # they have actually played, so they do not eat into the regulars' minutes.
+            often = [
+                min(max(p.share / p.mpg, 0.15), 1.0) if p is not None and p.mpg > 0 else 1.0
+                for p in players
+            ]
+            base = base * np.array(often)
         base = np.maximum(base, 0.5)
         if base.sum() >= 240.0:
             return base * 240.0 / base.sum()
@@ -350,6 +384,7 @@ class League:
         opp_id: str,
         date: str,
         available: list[dict[str, Any]] | None,
+        confirmed: bool = True,
     ) -> TeamView:
         team, opp = self._team(team_id), self._team(opp_id)
         rotation = self.rotation(team_id)
@@ -368,7 +403,7 @@ class League:
             group_of(e.get("pos") or (p.pos if p else ""))
             for e, p in zip(entries, players, strict=True)
         ]
-        minutes = self._minutes(players, [12.0] * len(entries))
+        minutes = self._minutes(players, [12.0] * len(entries), confirmed and available is not None)
         rates = np.array([self.player_rates(p, g) for p, g in zip(players, groups, strict=True)])
         tonight = rates.T @ minutes
 
@@ -407,6 +442,7 @@ class League:
 
         # Player-vs-position: weight the defence's weak spots by who takes the shots.
         dvp = self.dvp(opp_id)
+        allowed = self.allowed_factors(opp_id)
         play_rate = (
             rates[:, IX["fg2a"]]
             + rates[:, IX["fg3a"]]
@@ -463,6 +499,14 @@ class League:
                 p_ft=float(p_ft[i]), s3=float(s3[i]), p2=float(p2[i]), p3=float(p3[i]),
                 ftp=float(ftp[i]), matchup=float(matchup[i] ** 2), history=float(history[i]),
                 ppm=float(ppm[i]),
+                rate={
+                    "reb": float(rates[i, IX["orb"]] + rates[i, IX["drb"]]),
+                    "ast": float(rates[i, IX["ast"]]),
+                    "stl": float(rates[i, IX["stl"]]),
+                    "blk": float(rates[i, IX["blk"]]),
+                    "tov": float(rates[i, IX["tov"]]),
+                },
+                opp=allowed[groups[i]],
             )
             for i, (e, p) in enumerate(zip(entries, players, strict=True))
         ]  # fmt: skip
@@ -493,12 +537,14 @@ class League:
         home_available: list[dict[str, Any]] | None = None,
         away_available: list[dict[str, Any]] | None = None,
         neutral: bool = False,
+        confirmed: bool = True,
         regulation_minutes: float = 48.0,
     ) -> Matchup:
         """Pre-game view. ``*_available`` are ``{"id","name","pos"}`` dicts, or ``None`` for
-        "everyone in the recent rotation plays"."""
-        home = self._team_view(home_id, away_id, date, home_available)
-        away = self._team_view(away_id, home_id, date, away_available)
+        "everyone in the recent rotation plays". Pass ``confirmed=False`` when the lists are
+        a pre-game guess (an injury report) rather than a known active list."""
+        home = self._team_view(home_id, away_id, date, home_available, confirmed)
+        away = self._team_view(away_id, home_id, date, away_available, confirmed)
         th, ta = self._team(home_id), self._team(away_id)
         possessions = th.pace * ta.pace / self.pace * regulation_minutes / 48.0
         court = 0.0 if neutral else 1.0
@@ -541,6 +587,7 @@ class League:
         for view in (home, away):
             for p in view.players:
                 p.proj_pts = _player_points(p, possessions, view.rates)
+                p.proj = _player_line(p, possessions, view.rates, possessions / self.pace)
         return Matchup(home, away, possessions, features, meetings)
 
     # ---------------------------------------------------------------- updates
@@ -620,6 +667,8 @@ class League:
             _decay(40000.0),
         )
         played: set[str] = set()
+        for group in GROUPS:
+            opp.allowed[group] = opp.allowed[group] * decay_team
         for entry in opp.dvp.values():
             entry[0] *= decay_team
             entry[1] *= decay_team
@@ -648,6 +697,7 @@ class League:
             seen[1] += row["min"]
             group = player.group
             self.pos[group] = self.pos[group] * slow + vec
+            opp.allowed[group] = opp.allowed[group] + vec
             opp.dvp[group][0] += row["pts"]
             opp.dvp[group][1] += row["min"]
             played.add(player.id)
@@ -667,6 +717,8 @@ class League:
             for key in TEAM_KEYS:
                 team.off[key] *= 0.3
                 team.dfn[key] *= 0.3
+            for group in GROUPS:
+                team.allowed[group] = team.allowed[group] * 0.3
             for entry in team.dvp.values():
                 entry[0] *= 0.3
                 entry[1] *= 0.3
@@ -686,6 +738,22 @@ def _player_points(p: PlayerView, possessions: float, team_rates: dict[str, floa
     team_shot = 1 - r["p_tov"] - r["p_ft"]
     again = team_shot * (r["s3"] * (1 - r["p3"]) + (1 - r["s3"]) * (1 - r["p2"])) * r["orb"]
     return possessions / (1 - again) * p.usage * per_play
+
+
+def _player_line(
+    p: PlayerView, possessions: float, team_rates: dict[str, float], pace: float
+) -> dict[str, float]:
+    """Expected box-score line. Scoring comes from the possession model; the rest is the
+    player's per-minute rate scaled by minutes, game pace and what the opponent concedes."""
+    r = team_rates
+    team_shot = 1 - r["p_tov"] - r["p_ft"]
+    again = team_shot * (r["s3"] * (1 - r["p3"]) + (1 - r["s3"]) * (1 - r["p2"])) * r["orb"]
+    plays = possessions / (1 - again) * p.usage
+    shot = max(1 - p.p_tov - p.p_ft, 0.0)
+    line = {"pts": p.proj_pts, "fg3m": plays * shot * p.s3 * p.p3}
+    for stat in OPP_STATS:
+        line[stat] = p.rate[stat] * p.minutes * pace * p.opp.get(stat, 1.0) ** OPP_WEIGHT
+    return line
 
 
 def _pair(a: str, b: str) -> tuple[str, str]:

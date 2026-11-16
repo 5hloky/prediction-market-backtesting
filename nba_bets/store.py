@@ -130,3 +130,58 @@ def sync(first_season: int = FIRST_SEASON, *, workers: int = 8, verbose: bool = 
     DAYS_PATH.write_text(json.dumps(sorted(done)))
     log(f"cache holds {len(games)} games (+{added})")
     return added
+
+
+# --------------------------------------------------------------------------- player props
+
+PROPS_PATH = DATA_DIR / "props.jsonl.gz"
+FIRST_PROPS_SEASON = 2025  # ESPN has no prop history before 2024-25
+
+
+def load_props(path: Path = PROPS_PATH) -> dict[str, dict[str, Any]]:
+    """Game id -> opening prop lines, ``{athlete_id: {stat: [line, over, under]}}``."""
+    if not path.exists():
+        return {}
+    with gzip.open(path, "rt", encoding="utf-8") as handle:
+        return {row["id"]: row["props"] for row in map(json.loads, handle)}
+
+
+def _fetch_props(event_id: str) -> dict[str, Any]:
+    best: dict[str, Any] = {}
+    for book in espn.PROP_BOOKS:
+        parsed = espn.parse_props(espn.prop_bets(event_id, book), opening=True)
+        if sum(map(len, parsed.values())) > sum(map(len, best.values())):
+            best = parsed
+    return best
+
+
+def sync_props(*, workers: int = 8, verbose: bool = True) -> int:
+    """Fetch opening prop lines for every cached game that does not have them yet."""
+    props = load_props()
+    wanted = [
+        g["id"] for g in load_games() if g["season"] >= FIRST_PROPS_SEASON and g["id"] not in props
+    ]
+    if verbose:
+        print(f"fetching props for {len(wanted)} games", file=sys.stderr, flush=True)
+
+    def save() -> None:
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        tmp = PROPS_PATH.with_suffix(".tmp")
+        with gzip.open(tmp, "wt", encoding="utf-8") as handle:
+            for game_id, value in props.items():
+                handle.write(
+                    json.dumps({"id": game_id, "props": value}, separators=(",", ":")) + "\n"
+                )
+        tmp.replace(PROPS_PATH)
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        for index, (game_id, value) in enumerate(
+            zip(wanted, pool.map(_fetch_props, wanted), strict=True), 1
+        ):
+            props[game_id] = value
+            if index % 200 == 0:
+                save()
+                if verbose:
+                    print(f"  {index}/{len(wanted)}", file=sys.stderr, flush=True)
+    save()
+    return len(wanted)
