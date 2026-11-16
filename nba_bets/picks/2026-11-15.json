@@ -1,0 +1,444 @@
+{
+ "401909992": {
+  "game": "ATL @ MIL",
+  "made_at": "2026-11-16T00:39:49+00:00",
+  "grade": "LEAN",
+  "market": "spread",
+  "side": "home",
+  "line": 8.5,
+  "price": -109.0,
+  "label": "MIL +8.5",
+  "prob": 0.5,
+  "ev": -0.041284403669724745,
+  "props": [
+   {
+    "player_id": "4278039",
+    "player": "Nickeil Alexander-Walker",
+    "market": "ast",
+    "side": "more",
+    "line": 2.5,
+    "price": -172.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4869342",
+    "player": "Dyson Daniels",
+    "market": "fg3m",
+    "side": "more",
+    "line": 0.5,
+    "price": 184.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397020",
+    "player": "Luguentz Dort",
+    "market": "fg3m",
+    "side": "more",
+    "line": 1.5,
+    "price": 106.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397183",
+    "player": "Aaron Wiggins",
+    "market": "pts",
+    "side": "less",
+    "line": 12.5,
+    "price": -113.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397183",
+    "player": "Aaron Wiggins",
+    "market": "reb",
+    "side": "less",
+    "line": 3.5,
+    "price": -122.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397183",
+    "player": "Aaron Wiggins",
+    "market": "fg3m",
+    "side": "less",
+    "line": 2.5,
+    "price": -179.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397183",
+    "player": "Aaron Wiggins",
+    "market": "pra",
+    "side": "less",
+    "line": 18.5,
+    "price": -111.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397183",
+    "player": "Aaron Wiggins",
+    "market": "pr",
+    "side": "less",
+    "line": 16.5,
+    "price": -123.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397183",
+    "player": "Aaron Wiggins",
+    "market": "pa",
+    "side": "less",
+    "line": 14.5,
+    "price": -103.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397183",
+    "player": "Aaron Wiggins",
+    "market": "ra",
+    "side": "less",
+    "line": 5.5,
+    "price": 104.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5105623",
+    "player": "Kel'el Ware",
+    "market": "reb",
+    "side": "more",
+    "line": 5.5,
+    "price": -136.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pts",
+    "side": "less",
+    "line": 12.5,
+    "price": -120.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "reb",
+    "side": "less",
+    "line": 5.5,
+    "price": 115.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "ast",
+    "side": "less",
+    "line": 3.5,
+    "price": -141.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "fg3m",
+    "side": "less",
+    "line": 1.5,
+    "price": -152.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pra",
+    "side": "less",
+    "line": 22.5,
+    "price": -123.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pr",
+    "side": "less",
+    "line": 18.5,
+    "price": -109.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pa",
+    "side": "less",
+    "line": 15.5,
+    "price": -107.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "ra",
+    "side": "less",
+    "line": 9.5,
+    "price": -119.0,
+    "grade": "BET"
+   },
+   {
+    "player_id": "5164559",
+    "player": "Nate Ament",
+    "market": "pts",
+    "side": "less",
+    "line": 9.5,
+    "price": -131.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5164559",
+    "player": "Nate Ament",
+    "market": "reb",
+    "side": "less",
+    "line": 3.5,
+    "price": 100.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5164559",
+    "player": "Nate Ament",
+    "market": "pr",
+    "side": "less",
+    "line": 12.5,
+    "price": -103.0,
+    "grade": "LEAN"
+   }
+  ]
+ },
+ "401909993": {
+  "game": "OKC @ SAC",
+  "made_at": "2026-11-16T00:40:07+00:00",
+  "grade": "LEAN",
+  "market": "total",
+  "side": "over",
+  "line": 223.5,
+  "price": -110.0,
+  "label": "Over 223.5",
+  "prob": 0.5,
+  "ev": -0.045454545454545414,
+  "props": [
+   {
+    "player_id": "4278073",
+    "player": "Shai Gilgeous-Alexander",
+    "market": "ast",
+    "side": "more",
+    "line": 5.5,
+    "price": 108.0,
+    "grade": "BET"
+   },
+   {
+    "player_id": "4278073",
+    "player": "Shai Gilgeous-Alexander",
+    "market": "ra",
+    "side": "more",
+    "line": 9.5,
+    "price": -105.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4900671",
+    "player": "Ajay Mitchell",
+    "market": "pts",
+    "side": "less",
+    "line": 17.5,
+    "price": -106.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4222252",
+    "player": "Isaiah Hartenstein",
+    "market": "ast",
+    "side": "less",
+    "line": 4.5,
+    "price": -160.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4683778",
+    "player": "Jared McCain",
+    "market": "pts",
+    "side": "less",
+    "line": 15.5,
+    "price": -109.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4683778",
+    "player": "Jared McCain",
+    "market": "pra",
+    "side": "less",
+    "line": 21.5,
+    "price": -112.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4683778",
+    "player": "Jared McCain",
+    "market": "pr",
+    "side": "less",
+    "line": 19.5,
+    "price": -122.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4683778",
+    "player": "Jared McCain",
+    "market": "pa",
+    "side": "less",
+    "line": 18.5,
+    "price": -124.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5174983",
+    "player": "Aday Mara",
+    "market": "pts",
+    "side": "less",
+    "line": 9.5,
+    "price": -103.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5174983",
+    "player": "Aday Mara",
+    "market": "reb",
+    "side": "less",
+    "line": 6.5,
+    "price": -144.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5174983",
+    "player": "Aday Mara",
+    "market": "pra",
+    "side": "less",
+    "line": 17.5,
+    "price": -111.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5174983",
+    "player": "Aday Mara",
+    "market": "pr",
+    "side": "less",
+    "line": 15.5,
+    "price": -104.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5174983",
+    "player": "Aday Mara",
+    "market": "pa",
+    "side": "less",
+    "line": 11.5,
+    "price": -120.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5174983",
+    "player": "Aday Mara",
+    "market": "ra",
+    "side": "less",
+    "line": 7.5,
+    "price": 103.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3133626",
+    "player": "Kenrich Williams",
+    "market": "pts",
+    "side": "less",
+    "line": 8.5,
+    "price": -104.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3133626",
+    "player": "Kenrich Williams",
+    "market": "reb",
+    "side": "less",
+    "line": 4.5,
+    "price": -106.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3133626",
+    "player": "Kenrich Williams",
+    "market": "fg3m",
+    "side": "less",
+    "line": 1.5,
+    "price": -123.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3133626",
+    "player": "Kenrich Williams",
+    "market": "pra",
+    "side": "less",
+    "line": 15.5,
+    "price": -112.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3133626",
+    "player": "Kenrich Williams",
+    "market": "pr",
+    "side": "less",
+    "line": 13.5,
+    "price": -107.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3133626",
+    "player": "Kenrich Williams",
+    "market": "pa",
+    "side": "less",
+    "line": 10.5,
+    "price": -110.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3133626",
+    "player": "Kenrich Williams",
+    "market": "ra",
+    "side": "less",
+    "line": 6.5,
+    "price": -116.0,
+    "grade": "BET"
+   },
+   {
+    "player_id": "4594327",
+    "player": "Keegan Murray",
+    "market": "pts",
+    "side": "less",
+    "line": 11.5,
+    "price": -116.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4594327",
+    "player": "Keegan Murray",
+    "market": "fg3m",
+    "side": "less",
+    "line": 1.5,
+    "price": -119.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4594327",
+    "player": "Keegan Murray",
+    "market": "pr",
+    "side": "less",
+    "line": 15.5,
+    "price": -103.0,
+    "grade": "LEAN"
+   }
+  ]
+ }
+}
