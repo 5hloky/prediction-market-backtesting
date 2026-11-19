@@ -1,0 +1,814 @@
+{
+ "401910019": {
+  "game": "GS @ MEM",
+  "made_at": "2026-11-19T20:17:32+00:00",
+  "grade": "LEAN",
+  "market": "total",
+  "side": "over",
+  "line": 224.5,
+  "price": -110.0,
+  "label": "Over 224.5",
+  "prob": 0.5,
+  "ev": -0.045454545454545414,
+  "props": [
+   {
+    "player_id": "5175737",
+    "player": "Yaxel Lendeborg",
+    "market": "ast",
+    "side": "less",
+    "line": 4.5,
+    "price": -118.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5175737",
+    "player": "Yaxel Lendeborg",
+    "market": "pa",
+    "side": "less",
+    "line": 26.5,
+    "price": -114.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5175737",
+    "player": "Yaxel Lendeborg",
+    "market": "ra",
+    "side": "less",
+    "line": 11.5,
+    "price": -101.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4997536",
+    "player": "Gui Santos",
+    "market": "pts",
+    "side": "more",
+    "line": 7.5,
+    "price": -127.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4997536",
+    "player": "Gui Santos",
+    "market": "pr",
+    "side": "more",
+    "line": 12.5,
+    "price": 100.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4997536",
+    "player": "Gui Santos",
+    "market": "pa",
+    "side": "more",
+    "line": 10.5,
+    "price": -101.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397886",
+    "player": "Charles Bassey",
+    "market": "pts",
+    "side": "less",
+    "line": 8.5,
+    "price": -107.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397886",
+    "player": "Charles Bassey",
+    "market": "reb",
+    "side": "less",
+    "line": 7.5,
+    "price": -144.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397886",
+    "player": "Charles Bassey",
+    "market": "pr",
+    "side": "less",
+    "line": 16.5,
+    "price": -125.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4903027",
+    "player": "Cedric Coward",
+    "market": "reb",
+    "side": "less",
+    "line": 7.5,
+    "price": -110.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4903027",
+    "player": "Cedric Coward",
+    "market": "pra",
+    "side": "less",
+    "line": 26.5,
+    "price": -111.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4903027",
+    "player": "Cedric Coward",
+    "market": "pr",
+    "side": "less",
+    "line": 22.5,
+    "price": -104.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4903027",
+    "player": "Cedric Coward",
+    "market": "ra",
+    "side": "less",
+    "line": 11.5,
+    "price": -130.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433083",
+    "player": "Cam Spencer",
+    "market": "pts",
+    "side": "less",
+    "line": 12.5,
+    "price": -102.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433083",
+    "player": "Cam Spencer",
+    "market": "ast",
+    "side": "less",
+    "line": 7.5,
+    "price": -142.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433083",
+    "player": "Cam Spencer",
+    "market": "pra",
+    "side": "less",
+    "line": 23.5,
+    "price": -110.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433083",
+    "player": "Cam Spencer",
+    "market": "pr",
+    "side": "less",
+    "line": 16.5,
+    "price": -121.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433083",
+    "player": "Cam Spencer",
+    "market": "pa",
+    "side": "less",
+    "line": 20.5,
+    "price": -116.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433083",
+    "player": "Cam Spencer",
+    "market": "ra",
+    "side": "less",
+    "line": 10.5,
+    "price": -120.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432810",
+    "player": "Isaiah Stewart",
+    "market": "pts",
+    "side": "less",
+    "line": 9.5,
+    "price": -119.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432810",
+    "player": "Isaiah Stewart",
+    "market": "reb",
+    "side": "less",
+    "line": 4.5,
+    "price": -139.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432810",
+    "player": "Isaiah Stewart",
+    "market": "pr",
+    "side": "less",
+    "line": 13.5,
+    "price": -107.0,
+    "grade": "LEAN"
+   }
+  ]
+ },
+ "401910020": {
+  "game": "POR @ MIL",
+  "made_at": "2026-11-19T20:17:32+00:00",
+  "grade": "LEAN",
+  "market": "spread",
+  "side": "home",
+  "line": 11.5,
+  "price": -117.0,
+  "label": "MIL +11.5",
+  "prob": 0.5,
+  "ev": -0.07264957264957261,
+  "props": [
+   {
+    "player_id": "4683021",
+    "player": "Deni Avdija",
+    "market": "ast",
+    "side": "more",
+    "line": 5.5,
+    "price": -120.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "6606",
+    "player": "Damian Lillard",
+    "market": "pts",
+    "side": "less",
+    "line": 22.5,
+    "price": -111.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "6606",
+    "player": "Damian Lillard",
+    "market": "ast",
+    "side": "more",
+    "line": 4.5,
+    "price": -127.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3995",
+    "player": "Jrue Holiday",
+    "market": "ast",
+    "side": "more",
+    "line": 4.5,
+    "price": -113.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5105565",
+    "player": "Donovan Clingan",
+    "market": "pts",
+    "side": "less",
+    "line": 12.5,
+    "price": -102.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5105565",
+    "player": "Donovan Clingan",
+    "market": "pra",
+    "side": "less",
+    "line": 27.5,
+    "price": -107.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5105565",
+    "player": "Donovan Clingan",
+    "market": "pa",
+    "side": "less",
+    "line": 15.5,
+    "price": -116.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "pts",
+    "side": "less",
+    "line": 8.5,
+    "price": -119.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "reb",
+    "side": "less",
+    "line": 3.5,
+    "price": -106.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "ast",
+    "side": "less",
+    "line": 1.5,
+    "price": 134.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "fg3m",
+    "side": "less",
+    "line": 1.5,
+    "price": -136.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "pra",
+    "side": "less",
+    "line": 14.5,
+    "price": -117.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "pr",
+    "side": "less",
+    "line": 12.5,
+    "price": -125.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "pa",
+    "side": "less",
+    "line": 10.5,
+    "price": -115.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5081727",
+    "player": "Sidy Cissoko",
+    "market": "ra",
+    "side": "less",
+    "line": 5.5,
+    "price": -107.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432848",
+    "player": "Jaime Jaquez Jr.",
+    "market": "ast",
+    "side": "more",
+    "line": 3.5,
+    "price": -102.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pts",
+    "side": "less",
+    "line": 12.5,
+    "price": -116.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "reb",
+    "side": "less",
+    "line": 5.5,
+    "price": -112.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "ast",
+    "side": "less",
+    "line": 2.5,
+    "price": -110.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "fg3m",
+    "side": "less",
+    "line": 1.5,
+    "price": -124.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pra",
+    "side": "less",
+    "line": 20.5,
+    "price": -104.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pr",
+    "side": "less",
+    "line": 18.5,
+    "price": -124.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "pa",
+    "side": "less",
+    "line": 15.5,
+    "price": -129.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5082206",
+    "player": "Brayden Burries",
+    "market": "ra",
+    "side": "less",
+    "line": 8.5,
+    "price": -131.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5164559",
+    "player": "Nate Ament",
+    "market": "pts",
+    "side": "less",
+    "line": 8.5,
+    "price": -105.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5164559",
+    "player": "Nate Ament",
+    "market": "reb",
+    "side": "less",
+    "line": 3.5,
+    "price": -132.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5164559",
+    "player": "Nate Ament",
+    "market": "pr",
+    "side": "less",
+    "line": 12.5,
+    "price": -122.0,
+    "grade": "LEAN"
+   }
+  ]
+ },
+ "401910021": {
+  "game": "NY @ MIN",
+  "made_at": "2026-11-19T20:17:32+00:00",
+  "grade": "LEAN",
+  "market": "spread",
+  "side": "home",
+  "line": 1.5,
+  "price": -119.0,
+  "label": "MIN +1.5",
+  "prob": 0.5,
+  "ev": -0.07983193277310918,
+  "props": [
+   {
+    "player_id": "3934672",
+    "player": "Jalen Brunson",
+    "market": "pa",
+    "side": "less",
+    "line": 31.5,
+    "price": -108.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3136195",
+    "player": "Karl-Anthony Towns",
+    "market": "pts",
+    "side": "less",
+    "line": 20.5,
+    "price": -105.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3136195",
+    "player": "Karl-Anthony Towns",
+    "market": "reb",
+    "side": "less",
+    "line": 13.5,
+    "price": -135.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3136195",
+    "player": "Karl-Anthony Towns",
+    "market": "fg3m",
+    "side": "less",
+    "line": 1.5,
+    "price": -102.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3136195",
+    "player": "Karl-Anthony Towns",
+    "market": "pra",
+    "side": "less",
+    "line": 38.5,
+    "price": -116.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3136195",
+    "player": "Karl-Anthony Towns",
+    "market": "pr",
+    "side": "less",
+    "line": 34.5,
+    "price": -116.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3136195",
+    "player": "Karl-Anthony Towns",
+    "market": "pa",
+    "side": "less",
+    "line": 25.5,
+    "price": -126.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3136195",
+    "player": "Karl-Anthony Towns",
+    "market": "ra",
+    "side": "less",
+    "line": 17.5,
+    "price": -129.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "3914044",
+    "player": "Landry Shamet",
+    "market": "pts",
+    "side": "less",
+    "line": 8.5,
+    "price": -105.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397002",
+    "player": "Ayo Dosunmu",
+    "market": "pts",
+    "side": "less",
+    "line": 18.5,
+    "price": -126.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397002",
+    "player": "Ayo Dosunmu",
+    "market": "ast",
+    "side": "less",
+    "line": 3.5,
+    "price": 127.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397002",
+    "player": "Ayo Dosunmu",
+    "market": "pra",
+    "side": "less",
+    "line": 26.5,
+    "price": -114.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397002",
+    "player": "Ayo Dosunmu",
+    "market": "pr",
+    "side": "less",
+    "line": 22.5,
+    "price": -119.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4397002",
+    "player": "Ayo Dosunmu",
+    "market": "pa",
+    "side": "less",
+    "line": 22.5,
+    "price": -120.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433247",
+    "player": "Jonathan Kuminga",
+    "market": "pts",
+    "side": "less",
+    "line": 12.5,
+    "price": -101.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433247",
+    "player": "Jonathan Kuminga",
+    "market": "pra",
+    "side": "less",
+    "line": 20.5,
+    "price": -105.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4433247",
+    "player": "Jonathan Kuminga",
+    "market": "pr",
+    "side": "less",
+    "line": 18.5,
+    "price": -115.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432847",
+    "player": "Terrence Shannon Jr.",
+    "market": "pts",
+    "side": "less",
+    "line": 11.5,
+    "price": -108.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432847",
+    "player": "Terrence Shannon Jr.",
+    "market": "reb",
+    "side": "less",
+    "line": 2.5,
+    "price": 110.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432847",
+    "player": "Terrence Shannon Jr.",
+    "market": "ast",
+    "side": "less",
+    "line": 2.5,
+    "price": -139.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432847",
+    "player": "Terrence Shannon Jr.",
+    "market": "pra",
+    "side": "less",
+    "line": 17.5,
+    "price": -123.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432847",
+    "player": "Terrence Shannon Jr.",
+    "market": "pr",
+    "side": "less",
+    "line": 14.5,
+    "price": -114.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432847",
+    "player": "Terrence Shannon Jr.",
+    "market": "pa",
+    "side": "less",
+    "line": 14.5,
+    "price": -124.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4432847",
+    "player": "Terrence Shannon Jr.",
+    "market": "ra",
+    "side": "less",
+    "line": 5.5,
+    "price": -132.0,
+    "grade": "LEAN"
+   }
+  ]
+ },
+ "401910022": {
+  "game": "LAC @ SA",
+  "made_at": "2026-11-19T20:17:32+00:00",
+  "grade": "LEAN",
+  "market": "spread",
+  "side": "away",
+  "line": 15.5,
+  "price": -110.0,
+  "label": "LAC +15.5",
+  "prob": 0.5,
+  "ev": -0.045454545454545414,
+  "props": [
+   {
+    "player_id": "5254165",
+    "player": "Keaton Wagler",
+    "market": "pts",
+    "side": "more",
+    "line": 9.5,
+    "price": -112.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5254165",
+    "player": "Keaton Wagler",
+    "market": "ast",
+    "side": "more",
+    "line": 2.5,
+    "price": 106.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5254165",
+    "player": "Keaton Wagler",
+    "market": "pra",
+    "side": "more",
+    "line": 14.5,
+    "price": -124.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5254165",
+    "player": "Keaton Wagler",
+    "market": "pr",
+    "side": "more",
+    "line": 12.5,
+    "price": -109.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "5254165",
+    "player": "Keaton Wagler",
+    "market": "pa",
+    "side": "more",
+    "line": 11.5,
+    "price": -131.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4395630",
+    "player": "Devin Vassell",
+    "market": "ast",
+    "side": "more",
+    "line": 2.5,
+    "price": -104.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4395630",
+    "player": "Devin Vassell",
+    "market": "fg3m",
+    "side": "more",
+    "line": 1.5,
+    "price": -133.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4395723",
+    "player": "Keldon Johnson",
+    "market": "pts",
+    "side": "less",
+    "line": 11.5,
+    "price": -107.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4395723",
+    "player": "Keldon Johnson",
+    "market": "pra",
+    "side": "less",
+    "line": 19.5,
+    "price": -124.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4395723",
+    "player": "Keldon Johnson",
+    "market": "pr",
+    "side": "less",
+    "line": 17.5,
+    "price": -123.0,
+    "grade": "LEAN"
+   },
+   {
+    "player_id": "4395723",
+    "player": "Keldon Johnson",
+    "market": "pa",
+    "side": "less",
+    "line": 13.5,
+    "price": -113.0,
+    "grade": "LEAN"
+   }
+  ]
+ }
+}
